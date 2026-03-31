@@ -4,6 +4,8 @@ namespace App\Http\Requests\User;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 class StoreUserRequest extends FormRequest
 {
@@ -24,11 +26,25 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:100',
-            'email' => 'required|email|max:150|lowercase|unique:users,email',
-            'password' => 'required|string|min:8',
-            'role_id' => 'nullable|exists:roles,id',
-            'phone' => 'nullable|string|max:20|unique:users,phone',
-            'avatar' => 'nullable|string|max:255',
+            'email' => [
+                'required',
+                'email',
+                'max:150',
+                'lowercase',
+                Rule::unique('users', 'email'),
+            ],
+            'password' => [
+                'required',
+                Password::min(8)->letters()->numbers(),
+            ],
+            'role_id' => ['nullable', 'exists:roles,id'],
+            'phone' => [
+                'nullable',
+                'string',
+                'max:20',
+                Rule::unique('users', 'phone'),
+            ],
+            'avatar' => ['nullable', 'string', 'max:255'],
         ];
     }
 }
