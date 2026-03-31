@@ -12,18 +12,23 @@ class StoreUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array<mixed>|string>
+    //  * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|max:150|lowercase|unique:users,email',
+            'password' => 'required|string|min:8',
+            'role_id' => 'nullable|exists:roles,id',
+            'phone' => 'nullable|string|max:20|unique:users,phone',
+            'avatar' => 'nullable|string|max:255',
         ];
     }
 }
