@@ -3,22 +3,30 @@
 namespace App\Services;
 
 use App\Models\Role;
+use Illuminate\Database\Eloquent\Collection;
 
 class RoleService
 {
-    public function createRole(array $data) { return Role::create($data); }
+    public function createRole(array $data): Role
+    {
+        return Role::create($data);
+    }
 
-    public function updateRole(Role $role, array $data)
+    public function updateRole(Role $role, array $data): Role
     {
         $role->update($data);
         return $role;
     }
 
-    public function deleteRole(Role $role)
+    public function deleteRole(Role $role): bool
     {
-        $role->delete();
-        return true;
+        return $role->delete();
     }
 
-    public function listRoles() { return Role::all(); }
+    public function listRoles(): Collection
+    {
+        return Role::query()
+            ->latest()
+            ->get();
+    }
 }
