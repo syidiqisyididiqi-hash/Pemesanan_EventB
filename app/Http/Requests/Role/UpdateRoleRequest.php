@@ -25,7 +25,7 @@ class UpdateRoleRequest extends FormRequest
     {
         return [
             'name' => [
-                'required',
+                'sometimes',
                 'string',
                 'max:30',
                 Rule::unique('roles')->ignore($this->role),
