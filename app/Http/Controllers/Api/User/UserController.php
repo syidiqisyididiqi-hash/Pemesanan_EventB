@@ -78,9 +78,6 @@ class UserController extends Controller
     {
         $this->userService->deleteUser($user);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'User berhasil dihapus',
-        ], 200);
+        return response()->json(null, 204);
     }
 }

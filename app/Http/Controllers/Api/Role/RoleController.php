@@ -73,9 +73,7 @@ class RoleController extends Controller
     public function destroy(Role $role): JsonResponse
     {
         $this->roleService->deleteRole($role);
-        return response()->json([
-            'status' => true,
-            'message' => 'Role berhasil dihapus'
-        ], 200);
+
+        return response()->json(null, 204);
     }
 }
