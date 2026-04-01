@@ -3,25 +3,18 @@
 namespace App\Services;
 
 use App\Models\Category;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class CategoryService
 {
     public function createCategory(array $data): Category
     {
-        $category = new Category();
-        $category->fill($data);
-        $category->save();
-
-        return $category;
+        return Category::create($data);
     }
 
     public function updateCategory(Category $category, array $data): Category
     {
-        $category->fill($data);
-        $category->save();
-
+        $category->update($data);
         return $category;
     }
 
@@ -35,10 +28,5 @@ class CategoryService
         return Category::query()
             ->latest()
             ->paginate(10);
-    }
-
-    public function getCategoryById(int $id): Category
-    {
-        return Category::findOrFail($id);
     }
 }

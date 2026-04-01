@@ -3,7 +3,8 @@
 namespace App\Services;
 
 use App\Models\Role;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+
 
 class RoleService
 {
@@ -23,10 +24,10 @@ class RoleService
         return $role->delete();
     }
 
-    public function listRoles(): Collection
+    public function listRoles(): LengthAwarePaginator
     {
         return Role::query()
             ->latest()
-            ->get();
+            ->paginate(10);
     }
 }
