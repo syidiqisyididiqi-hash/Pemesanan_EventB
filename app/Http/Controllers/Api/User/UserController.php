@@ -22,11 +22,9 @@ class UserController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json([
-            'status' => true,
-            'message' => 'Semua data user berhasil diambil',
-            'data' => $this->userService->listUsers()
-        ], 200);
+        return response()->json(
+            $this->userService->listUsers()
+        );
     }
 
     /**
@@ -37,7 +35,6 @@ class UserController extends Controller
         $user = $this->userService->createUser($request->validated());
 
         return response()->json([
-            'status' => true,
             'message' => 'User berhasil dibuat',
             'data' => $user
         ], 201);
@@ -50,11 +47,7 @@ class UserController extends Controller
     {
         $user->load('role');
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Data user berhasil diambil',
-            'data' => $user
-        ], 200);
+        return response()->json($user);
     }
 
     /**
@@ -65,7 +58,6 @@ class UserController extends Controller
         $user = $this->userService->updateUser($user, $request->validated());
 
         return response()->json([
-            'status' => true,
             'message' => 'User berhasil diperbarui',
             'data' => $user
         ], 200);

@@ -22,11 +22,9 @@ class RoleController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json([
-            'status' => true,
-            'message' => 'Semua data role berhasil diambil',
-            'data' => $this->roleService->listRoles()
-        ], 200);
+        return response()->json(
+            $this->roleService->listRoles()
+        );
     }
 
     /**
@@ -35,8 +33,8 @@ class RoleController extends Controller
     public function store(StoreRoleRequest $request): JsonResponse
     {
         $role = $this->roleService->createRole($request->validated());
+
         return response()->json([
-            'status' => true,
             'message' => 'Role berhasil dibuat',
             'data' => $role
         ], 201);
@@ -47,11 +45,7 @@ class RoleController extends Controller
      */
     public function show(Role $role): JsonResponse
     {
-        return response()->json([
-            'status' => true,
-            'message' => 'Data role berhasil diambil',
-            'data' => $role
-        ], 200);
+        return response()->json($role);
     }
 
     /**
@@ -60,8 +54,8 @@ class RoleController extends Controller
     public function update(UpdateRoleRequest $request, Role $role): JsonResponse
     {
         $role = $this->roleService->updateRole($role, $request->validated());
+
         return response()->json([
-            'status' => true,
             'message' => 'Role berhasil diperbarui',
             'data' => $role
         ], 200);

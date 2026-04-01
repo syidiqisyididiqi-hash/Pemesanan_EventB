@@ -8,7 +8,6 @@ use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Models\Category;
 use App\Services\CategoryService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -24,19 +23,9 @@ class CategoryController extends Controller
      */
     public function index(): JsonResponse
     {
-        $categories = $this->categoryService->listCategories();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Semua data kategori berhasil diambil',
-            'data' => $categories->items(),
-            'meta' => [
-                'current_page' => $categories->currentPage(),
-                'last_page' => $categories->lastPage(),
-                'per_page' => $categories->perPage(),
-                'total' => $categories->total(),
-            ],
-        ]);
+        return response()->json(
+            $this->categoryService->listCategories()
+        );
     }
 
     /**
@@ -47,7 +36,6 @@ class CategoryController extends Controller
         $category = $this->categoryService->createCategory($request->validated());
 
         return response()->json([
-            'status' => true,
             'message' => 'Kategori berhasil dibuat',
             'data' => $category
         ], 201);
@@ -58,11 +46,7 @@ class CategoryController extends Controller
      */
     public function show(Category $category): JsonResponse
     {
-        return response()->json([
-            'status' => true,
-            'message' => 'Data kategori berhasil diambil',
-            'data' => $category
-        ]);
+        return response()->json($category);
     }
 
     /**
@@ -73,7 +57,6 @@ class CategoryController extends Controller
         $category = $this->categoryService->updateCategory($category, $request->validated());
 
         return response()->json([
-            'status' => true,
             'message' => 'Kategori berhasil diperbarui',
             'data' => $category
         ], 200);
