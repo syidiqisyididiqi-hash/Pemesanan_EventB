@@ -5,6 +5,7 @@ namespace App\Http\Requests\Category;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class StoreCategoryRequest extends FormRequest
 {
@@ -37,7 +38,21 @@ class StoreCategoryRequest extends FormRequest
                 'alpha_dash',
                 Rule::unique('categories', 'slug'),
             ],
-            'description' => 'nullable|string|max:200',
+            'description' => [
+                'nullable',
+                'string',
+                'max:200',
+            ],
         ];
+    }
+    protected function prepareForValidation(): void
+    {
+        $slugSource = $this->has('slug')
+            ? $this->slug     
+            : $this->name;    
+
+        $this->merge([
+            'slug' => Str::slug($slugSource),
+        ]);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Requests\Category;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class UpdateCategoryRequest extends FormRequest
 {
@@ -41,5 +42,20 @@ class UpdateCategoryRequest extends FormRequest
             ],
             'description' => 'nullable|string|max:200',
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('slug')) {
+            $this->merge([
+                'slug' => Str::slug($this->slug),
+            ]);
+        }
+
+        if ($this->has('name') && !$this->has('slug')) {
+            $this->merge([
+                'slug' => Str::slug($this->name),
+            ]);
+        }
     }
 }
