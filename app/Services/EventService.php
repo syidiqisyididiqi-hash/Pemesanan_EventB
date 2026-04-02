@@ -7,15 +7,18 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class EventService
 {
-    public function createEvent(array $data): Event
+    public function createEvent(array $data, int $organizerId): Event
     {
+        $data['organizer_id'] = $organizerId;
+
         return Event::create($data);
     }
 
     public function updateEvent(Event $event, array $data): Event
     {
         $event->update($data);
-        return $event;
+
+        return $event->fresh();
     }
 
     public function deleteEvent(Event $event): bool
@@ -26,7 +29,10 @@ class EventService
     public function listEvent(): LengthAwarePaginator
     {
         return Event::query()
-            ->latest()
+            ->with(['category', 'organizer', 'images'])
+            ->published()
+            ->upcoming()
+            ->orderBy('event_at')
             ->paginate(10);
     }
 }
