@@ -33,43 +33,42 @@ class StoreEventRequest extends FormRequest
                 'string',
                 'max:170',
                 'alpha_dash',
-                'unique:events,slug'
+                'unique:events,slug',
             ],
 
-            'evnet_at' => [
+            'event_at' => [
                 'required',
                 'date',
-                'after:now'
+                'after:now',
             ],
 
             'location' => ['required', 'string', 'max:150'],
 
-            'quota' => [
-                'required',
-                'integer',
-                'min:1',
-            ],
+            'quota' => ['required', 'integer', 'min:1'],
 
-            'price' => [
-                'required',
-                'numeric',
-                'min:0',
-            ],
+            'price' => ['required', 'numeric', 'min:0'],
 
             'status' => [
-                'required',
+                'sometimes',
                 Rule::in(['draft', 'published', 'cancelled']),
             ],
 
             'category_id' => [
                 'required',
+                'integer',
                 'exists:categories,id',
             ],
-
-            'organizer_id' => [
-                'required',
-                'exists:users,id',
-            ],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'title' => trim($this->title ?? ''),
+            'location' => trim($this->location ?? ''),
+            'slug' => $this->input('slug')
+                ? strtolower($this->input('slug'))
+                : null,
+        ]);
     }
 }

@@ -23,7 +23,8 @@ class UpdateEventRequest extends FormRequest
      */
     public function rules(): array
     {
-        $eventId = $this->route('event')->id;
+        $event = $this->route('event');
+        $eventId = is_object($event) ? $event->id : $event;
 
         return [
             'title' => ['sometimes', 'string', 'max:150'],
@@ -38,25 +39,13 @@ class UpdateEventRequest extends FormRequest
                 Rule::unique('events', 'slug')->ignore($eventId),
             ],
 
-            'event_at' => [
-                'sometimes',
-                'date',
-                'after:now',
-            ],
+            'event_at' => ['sometimes', 'date', 'after:now'],
 
             'location' => ['sometimes', 'string', 'max:150'],
 
-            'quota' => [
-                'sometimes',
-                'integer',
-                'min:1',
-            ],
+            'quota' => ['sometimes', 'integer', 'min:1'],
 
-            'price' => [
-                'sometimes',
-                'numeric',
-                'min:0',
-            ],
+            'price' => ['sometimes', 'numeric', 'min:0'],
 
             'status' => [
                 'sometimes',
@@ -65,13 +54,32 @@ class UpdateEventRequest extends FormRequest
 
             'category_id' => [
                 'sometimes',
+                'integer',
                 'exists:categories,id',
             ],
-
-            'organizer_id' => [
-                'sometimes',
-                'exists:users,id',
-            ],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $merge = [];
+
+        if ($this->has('title')) {
+            $merge['title'] = trim($this->input('title'));
+        }
+
+        if ($this->has('location')) {
+            $merge['location'] = trim($this->input('location'));
+        }
+
+        if ($this->has('description')) {
+            $merge['description'] = trim($this->input('description'));
+        }
+
+        if ($this->has('slug')) {
+            $merge['slug'] = strtolower($this->input('slug'));
+        }
+
+        $this->merge($merge);
     }
 }
