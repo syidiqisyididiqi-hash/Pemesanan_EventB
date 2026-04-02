@@ -8,6 +8,7 @@ use App\Http\Requests\Event\UpdateEventRequest;
 use App\Models\Event;
 use App\Services\EventService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class EventController extends Controller
@@ -33,10 +34,13 @@ class EventController extends Controller
      */
     public function store(StoreEventRequest $request): JsonResponse
     {
-        $event = $this->eventService->createEvent($request->validated());
+        $event = $this->eventService->createEvent(
+            $request->validated(),
+            Auth::id()
+        );
 
         return response()->json([
-            'messsage' => 'Event berhasil dibuat',
+            'message' => 'Event berhasil dibuat',
             'data' => $event
         ], 201);
     }
@@ -46,6 +50,8 @@ class EventController extends Controller
      */
     public function show(Event $event): JsonResponse
     {
+        $event->load(['category', 'organizer', 'images']);
+
         return response()->json($event);
     }
 
