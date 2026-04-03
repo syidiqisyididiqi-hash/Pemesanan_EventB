@@ -9,13 +9,20 @@ class BookingService
 {
     public function createBooking(array $data): Booking
     {
-        return Booking::create($data);
+        return Booking::create($data)
+            ->load(['user', 'event']);
     }
 
     public function updateBooking(Booking $booking, array $data): Booking
     {
-        $booking->update($data);
-        return $booking;
+        $allowed = collect($data)->only([
+            'booking_date',
+            'status',
+        ])->toArray();
+
+        $booking->update($allowed);
+
+        return $booking->load(['user', 'event']);
     }
 
     public function deleteBooking(Booking $booking): bool
@@ -25,7 +32,7 @@ class BookingService
 
     public function listBookings(): LengthAwarePaginator
     {
-        return Booking::query()
+        return Booking::with(['user', 'event'])
             ->latest()
             ->paginate(10);
     }

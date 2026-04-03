@@ -4,6 +4,7 @@ namespace App\Http\Requests\Booking;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class UpdateBookingRequest extends FormRequest
 {
@@ -22,15 +23,11 @@ class UpdateBookingRequest extends FormRequest
      */
     public function rules(): array
     {
-        $this->route('booking');
-
         return [
-            'user_id' => ['sometimes', 'exists:user,id'],
-            'event_id' => ['sometimes', 'exists:event,id'],
             'booking_date' => ['sometimes', 'date'],
             'status' => [
                 'sometimes',
-                'in:pending, paid, cancelled'
+                'in:pending,paid,cancelled'
             ]
         ];
     }

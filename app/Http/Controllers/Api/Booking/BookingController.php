@@ -48,7 +48,12 @@ class BookingController extends Controller
      */
     public function show(Booking $booking): JsonResponse
     {
-        return response()->json($booking);
+        $booking->load(['user', 'event']);
+
+        return response()->json([
+            'message' => 'Booking ditemukan',
+            'data' => $booking
+        ]);
     }
 
     /**

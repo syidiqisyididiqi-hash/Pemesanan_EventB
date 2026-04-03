@@ -4,6 +4,7 @@ namespace App\Http\Requests\Booking;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class StoreBookingRequest extends FormRequest
 {
@@ -23,13 +24,15 @@ class StoreBookingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => ['required', 'exists:user,id'],
-            'event_id' => ['required', 'exists:event,id'],
+            'event_id' => ['required', 'exists:events,id'],
             'booking_date' => ['required', 'date'],
-            'status' =>[
-                'required',
-                'in:pending, paid, cancelled'
-            ]
         ];
+    }
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'user_id' => Auth::id(),
+            'status' => 'pending',
+        ]);
     }
 }
