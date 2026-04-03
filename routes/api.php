@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Booking\BookingController;
 use App\Http\Controllers\Api\Category\CategoryController;
 use App\Http\Controllers\Api\Event\EventController;
 use App\Http\Controllers\Api\Role\RoleController;
@@ -12,4 +13,6 @@ Route::apiResource('users', UserController::class);
 
 Route::apiResource('categories', CategoryController::class);
 
-Route::apiResource('categories', EventController::class);
+Route::apiResource('events', EventController::class);
+
+Route::apiResource('bookings', BookingController::class);
