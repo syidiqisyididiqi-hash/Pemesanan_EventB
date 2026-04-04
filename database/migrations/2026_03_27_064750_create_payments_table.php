@@ -17,7 +17,12 @@ return new class extends Migration {
                 ->constrained()
                 ->cascadeOnDelete();
             $table->decimal('amount', 10, 2);
-            $table->string('payment_method', 50);
+            $table->enum('payment_method', [
+                'credit_card',
+                'debit_card',
+                'e_wallet',
+                'bank_transfer'
+            ]);
             $table->timestamp('payment_date')->nullable();
             $table->enum('status', ['unpaid', 'paid', 'failed'])->default('unpaid');
             $table->index('status');
