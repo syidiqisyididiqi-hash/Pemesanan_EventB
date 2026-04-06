@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreReviewRequest extends FormRequest
+class UpdateReviewRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,18 +23,21 @@ class StoreReviewRequest extends FormRequest
      */
     public function rules(): array
     {
+        $reviewId = $this->route('review')->id;
+
         return [
             'event_id' => [
-                'required',
+                'sometimes',
                 'exists:events,id',
                 Rule::unique('reviews')
                     ->where(
                         fn($query) =>
                         $query->where('user_id', $this->user()->id)
-                    ),
+                    )
+                    ->ignore($reviewId),
             ],
-            'rating' => ['required', 'integer', 'between:1,5'],
-            'comment' => ['nullable', 'string'],
+            'rating' => ['sometimes', 'integer', 'between:1,5'],
+            'comment' => ['sometimes', 'string'],
         ];
     }
 }
