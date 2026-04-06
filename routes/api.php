@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Category\CategoryController;
 use App\Http\Controllers\Api\Event\EventController;
 use App\Http\Controllers\Api\Image\ImageController;
 use App\Http\Controllers\Api\Payment\PaymentController;
+use App\Http\Controllers\Api\Review\ReviewController;
 use App\Http\Controllers\Api\Role\RoleController;
 use App\Http\Controllers\Api\User\UserController;
 use Illuminate\Support\Facades\Route;
@@ -22,3 +23,5 @@ Route::apiResource('bookings', BookingController::class);
 Route::apiResource('payments', PaymentController::class);
 
 Route::apiResource('images', ImageController::class);
+
+Route::apiResource('reviews', ReviewController::class);
