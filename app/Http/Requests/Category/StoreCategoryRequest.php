@@ -32,7 +32,6 @@ class StoreCategoryRequest extends FormRequest
                 Rule::unique('categories', 'name'),
             ],
             'slug' => [
-                'required',
                 'string',
                 'max:120',
                 'alpha_dash',
@@ -45,11 +44,12 @@ class StoreCategoryRequest extends FormRequest
             ],
         ];
     }
+
     protected function prepareForValidation(): void
     {
         $slugSource = $this->has('slug')
-            ? $this->slug     
-            : $this->name;    
+            ? $this->slug
+            : $this->name;
 
         $this->merge([
             'slug' => Str::slug($slugSource),

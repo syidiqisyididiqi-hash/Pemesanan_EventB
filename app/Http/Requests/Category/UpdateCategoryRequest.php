@@ -24,7 +24,10 @@ class UpdateCategoryRequest extends FormRequest
      */
     public function rules(): array
     {
-        $categoryId = $this->route('category')->id;
+        $category = $this->route('category');
+        $categoryId = $category instanceof \App\Models\Category
+            ? $category->id
+            : $category;
 
         return [
             'name' => [
@@ -33,26 +36,13 @@ class UpdateCategoryRequest extends FormRequest
                 'max:100',
                 Rule::unique('categories', 'name')->ignore($categoryId),
             ],
-            'slug' => [
-                'sometimes',
-                'string',
-                'max:120',
-                'alpha_dash',
-                Rule::unique('categories', 'slug')->ignore($categoryId),
-            ],
             'description' => 'nullable|string|max:200',
         ];
     }
 
     protected function prepareForValidation(): void
     {
-        if ($this->has('slug')) {
-            $this->merge([
-                'slug' => Str::slug($this->slug),
-            ]);
-        }
-
-        if ($this->has('name') && !$this->has('slug')) {
+        if ($this->has('name')) {
             $this->merge([
                 'slug' => Str::slug($this->name),
             ]);

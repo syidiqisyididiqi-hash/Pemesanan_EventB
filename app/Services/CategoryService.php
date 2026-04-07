@@ -3,18 +3,32 @@
 namespace App\Services;
 
 use App\Models\Category;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class CategoryService
 {
     public function createCategory(array $data): Category
     {
-        return Category::create($data);
+        $allowed = Arr::only($data, [
+            'name',
+            'slug',
+            'description',
+        ]);
+
+        return Category::create($allowed);
     }
 
     public function updateCategory(Category $category, array $data): Category
     {
-        $category->update($data);
+        $allowed = Arr::only($data, [
+            'name',
+            'slug',
+            'description',
+        ]);
+
+        $category->update($allowed);
+
         return $category;
     }
 
@@ -23,10 +37,13 @@ class CategoryService
         return $category->delete();
     }
 
-    public function listCategories(): LengthAwarePaginator
+    public function listCategories(int $perPage = 10): LengthAwarePaginator
     {
-        return Category::query()
-            ->latest()
-            ->paginate(10);
+        return Category::latest()->paginate($perPage);
+    }
+
+    public function findCategoryOrFail(int $id): Category
+    {
+        return Category::findOrFail($id);
     }
 }

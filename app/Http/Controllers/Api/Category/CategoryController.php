@@ -23,9 +23,12 @@ class CategoryController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json(
-            $this->categoryService->listCategories()
-        );
+        $categories = $this->categoryService->listCategories();
+
+        return response()->json([
+            'message' => 'Categories retrieved successfully',
+            'data' => $categories
+        ]);
     }
 
     /**
@@ -46,7 +49,10 @@ class CategoryController extends Controller
      */
     public function show(Category $category): JsonResponse
     {
-        return response()->json($category);
+        return response()->json([
+            'message' => 'Category retrieved successfully',
+            'data' => $category
+        ]);
     }
 
     /**
@@ -57,9 +63,9 @@ class CategoryController extends Controller
         $category = $this->categoryService->updateCategory($category, $request->validated());
 
         return response()->json([
-            'message' => 'Kategori berhasil diperbarui',
+            'message' => 'Category updated successfully',
             'data' => $category
-        ], 200);
+        ]);
     }
 
     /**
