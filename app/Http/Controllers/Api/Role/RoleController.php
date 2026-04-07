@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\Role;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreRoleRequest;
-use App\Http\Requests\UpdateRoleRequest;
+use App\Http\Requests\Role\StoreRoleRequest;
+use App\Http\Requests\Role\UpdateRoleRequest;
 use App\Models\Role;
 use App\Services\RoleService;
 use Illuminate\Http\JsonResponse;
@@ -22,9 +22,12 @@ class RoleController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json(
-            $this->roleService->listRoles()
-        );
+        $roles = Role::all();
+
+        return response()->json([
+            'message' => 'Roles retrieved successfully',
+            'data' => $roles
+        ]);
     }
 
     /**
@@ -35,7 +38,7 @@ class RoleController extends Controller
         $role = $this->roleService->createRole($request->validated());
 
         return response()->json([
-            'message' => 'Role berhasil dibuat',
+            'message' => 'Role created successfully',
             'data' => $role
         ], 201);
     }
@@ -45,7 +48,10 @@ class RoleController extends Controller
      */
     public function show(Role $role): JsonResponse
     {
-        return response()->json($role);
+        return response()->json([
+            'message' => 'Role retrieved successfully',
+            'data' => $role
+        ]);
     }
 
     /**
@@ -53,12 +59,12 @@ class RoleController extends Controller
      */
     public function update(UpdateRoleRequest $request, Role $role): JsonResponse
     {
-        $role = $this->roleService->updateRole($role, $request->validated());
+        $updated = $this->roleService->updateRole($role, $request->validated());
 
         return response()->json([
-            'message' => 'Role berhasil diperbarui',
-            'data' => $role
-        ], 200);
+            'message' => 'Role updated successfully',
+            'data' => $updated
+        ]);
     }
 
     /**

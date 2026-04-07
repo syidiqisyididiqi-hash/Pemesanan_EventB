@@ -3,19 +3,30 @@
 namespace App\Services;
 
 use App\Models\Role;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-
 
 class RoleService
 {
     public function createRole(array $data): Role
     {
-        return Role::create($data);
+        $allowed = Arr::only($data, [
+            'name',
+            'description',
+        ]);
+
+        return Role::create($allowed);
     }
 
     public function updateRole(Role $role, array $data): Role
     {
-        $role->update($data);
+        $allowed = Arr::only($data, [
+            'name',
+            'description',
+        ]);
+
+        $role->update($allowed);
+
         return $role;
     }
 
@@ -24,10 +35,13 @@ class RoleService
         return $role->delete();
     }
 
-    public function listRoles(): LengthAwarePaginator
+    public function listRoles(int $perPage = 10): LengthAwarePaginator
     {
-        return Role::query()
-            ->latest()
-            ->paginate(10);
+        return Role::latest()->paginate($perPage);
+    }
+
+    public function findRoleOrFail(int $id): Role
+    {
+        return Role::findOrFail($id);
     }
 }
