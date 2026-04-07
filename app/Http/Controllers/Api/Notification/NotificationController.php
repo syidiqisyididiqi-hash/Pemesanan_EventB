@@ -10,10 +10,6 @@ use App\Http\Requests\Notification\StoreNotificationRequest;
 use App\Models\Notification;
 use App\Http\Requests\Notification\UpdateNotificationRequest;
 
-
-
-
-
 class NotificationController extends Controller
 {
     protected NotificationService $notificationService;
