@@ -3,7 +3,9 @@
 namespace App\Http\Requests\User;
 
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
@@ -15,6 +17,14 @@ class StoreUserRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+    }
+
+    protected function failedValidation(Validator $validator): void
+    {
+        throw new HttpResponseException(response()->json([
+            'message' => 'Validation failed',
+            'errors' => $validator->errors(),
+        ], 422));
     }
 
     /**
