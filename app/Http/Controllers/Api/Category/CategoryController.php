@@ -26,7 +26,7 @@ class CategoryController extends Controller
         $categories = $this->categoryService->listCategories();
 
         return response()->json([
-            'message' => 'Categories retrieved successfully',
+            'message' => 'Category retrieved successfully',
             'data' => $categories
         ]);
     }
@@ -39,7 +39,7 @@ class CategoryController extends Controller
         $category = $this->categoryService->createCategory($request->validated());
 
         return response()->json([
-            'message' => 'Kategori berhasil dibuat',
+            'message' => 'Category created successfully',
             'data' => $category
         ], 201);
     }
