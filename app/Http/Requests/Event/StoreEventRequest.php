@@ -5,6 +5,7 @@ namespace App\Http\Requests\Event;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class StoreEventRequest extends FormRequest
 {
@@ -25,39 +26,14 @@ class StoreEventRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:150'],
-
             'description' => ['required', 'string'],
-
-            'slug' => [
-                'required',
-                'string',
-                'max:170',
-                'alpha_dash',
-                'unique:events,slug',
-            ],
-
-            'event_at' => [
-                'required',
-                'date',
-                'after:now',
-            ],
-
+            'slug' => ['nullable', 'string', 'max:170', 'alpha_dash', 'unique:events,slug'],
+            'event_at' => ['required', 'date', 'after:now'],
             'location' => ['required', 'string', 'max:150'],
-
-            'quota' => ['required', 'integer', 'min:1'],
-
-            'price' => ['required', 'numeric', 'min:0'],
-
-            'status' => [
-                'sometimes',
-                Rule::in(['draft', 'published', 'cancelled']),
-            ],
-
-            'category_id' => [
-                'required',
-                'integer',
-                'exists:categories,id',
-            ],
+            'quota' => ['required', 'integer', 'min:1', 'max:100000'],
+            'price' => ['required', 'numeric', 'min:0', 'max:99999999'],
+            'status' => ['nullable', Rule::in(['draft', 'published', 'cancelled'])],
+            'category_id' => ['required', 'exists:categories,id'],
         ];
     }
 
@@ -65,10 +41,9 @@ class StoreEventRequest extends FormRequest
     {
         $this->merge([
             'title' => trim($this->title ?? ''),
+            'description' => trim($this->description ?? ''),
             'location' => trim($this->location ?? ''),
-            'slug' => $this->input('slug')
-                ? strtolower($this->input('slug'))
-                : null,
+            'slug' => Str::slug($this->slug ?? $this->title),
         ]);
     }
 }

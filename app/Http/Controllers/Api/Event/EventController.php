@@ -24,9 +24,12 @@ class EventController extends Controller
      */
     public function index()
     {
-        return response()->json(
-            $this->eventService->listEvent()
-        );
+        $events = $this->eventService->listEvents();
+
+        return response()->json([
+            'message' => 'Events retrieved successfully',
+            'data' => $events
+        ]);
     }
 
     /**
@@ -40,7 +43,7 @@ class EventController extends Controller
         );
 
         return response()->json([
-            'message' => 'Event berhasil dibuat',
+            'message' => 'Event created successfully',
             'data' => $event
         ], 201);
     }
@@ -52,7 +55,10 @@ class EventController extends Controller
     {
         $event->load(['category', 'organizer', 'images']);
 
-        return response()->json($event);
+        return response()->json([
+            'message' => 'Event retrieved successfully',
+            'data' => $event
+        ]);
     }
 
     /**
@@ -60,12 +66,15 @@ class EventController extends Controller
      */
     public function update(UpdateEventRequest $request, Event $event): JsonResponse
     {
-        $event = $this->eventService->updateEvent($event, $request->validated());
+        $event = $this->eventService->updateEvent(
+            $event,
+            $request->validated()
+        );
 
         return response()->json([
-            'message' => 'Event berhasil diperbarui',
+            'message' => 'Event updated successfully',
             'data' => $event
-        ], 200);
+        ]);
     }
 
     /**

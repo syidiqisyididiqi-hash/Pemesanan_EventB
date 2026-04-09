@@ -5,6 +5,7 @@ namespace App\Http\Requests\Event;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class UpdateEventRequest extends FormRequest
 {
@@ -23,14 +24,11 @@ class UpdateEventRequest extends FormRequest
      */
     public function rules(): array
     {
-        $event = $this->route('event');
-        $eventId = is_object($event) ? $event->id : $event;
+        $eventId = $this->route('event')->id ?? $this->route('event');
 
         return [
             'title' => ['sometimes', 'string', 'max:150'],
-
             'description' => ['sometimes', 'string'],
-
             'slug' => [
                 'sometimes',
                 'string',
@@ -38,48 +36,22 @@ class UpdateEventRequest extends FormRequest
                 'alpha_dash',
                 Rule::unique('events', 'slug')->ignore($eventId),
             ],
-
             'event_at' => ['sometimes', 'date', 'after:now'],
-
             'location' => ['sometimes', 'string', 'max:150'],
-
-            'quota' => ['sometimes', 'integer', 'min:1'],
-
-            'price' => ['sometimes', 'numeric', 'min:0'],
-
-            'status' => [
-                'sometimes',
-                Rule::in(['draft', 'published', 'cancelled']),
-            ],
-
-            'category_id' => [
-                'sometimes',
-                'integer',
-                'exists:categories,id',
-            ],
+            'quota' => ['sometimes', 'integer', 'min:1', 'max:100000'],
+            'price' => ['sometimes', 'numeric', 'min:0', 'max:99999999'],
+            'status' => ['sometimes', Rule::in(['draft', 'published', 'cancelled'])],
+            'category_id' => ['sometimes', 'exists:categories,id'],
         ];
     }
 
     protected function prepareForValidation(): void
     {
-        $merge = [];
-
-        if ($this->has('title')) {
-            $merge['title'] = trim($this->input('title'));
-        }
-
-        if ($this->has('location')) {
-            $merge['location'] = trim($this->input('location'));
-        }
-
-        if ($this->has('description')) {
-            $merge['description'] = trim($this->input('description'));
-        }
-
-        if ($this->has('slug')) {
-            $merge['slug'] = strtolower($this->input('slug'));
-        }
-
-        $this->merge($merge);
+        $this->merge([
+            'title' => trim($this->title ?? ''),
+            'description' => trim($this->description ?? ''),
+            'location' => trim($this->location ?? ''),
+            'slug' => Str::slug($this->slug ?? $this->title),
+        ]);
     }
 }

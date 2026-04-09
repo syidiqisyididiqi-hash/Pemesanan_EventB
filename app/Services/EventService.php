@@ -3,20 +3,49 @@
 namespace App\Services;
 
 use App\Models\Event;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class EventService
 {
-    public function createEvent(array $data, int $organizerId): Event
+    public function createEvent(array $data, ?int $organizerId): Event
     {
-        $data['organizer_id'] = $organizerId;
+        if (!$organizerId) {
+            throw new \RuntimeException('Organizer (authenticated user) is required to create event.');
+        }
 
-        return Event::create($data);
+        $allowed = Arr::only($data, [
+            'title',
+            'slug',
+            'description',
+            'event_at',
+            'location',
+            'quota',
+            'price',
+            'status',
+            'category_id',
+        ]);
+
+        $allowed['organizer_id'] = $organizerId;
+
+        return Event::create($allowed);
     }
 
     public function updateEvent(Event $event, array $data): Event
     {
-        $event->update($data);
+        $allowed = Arr::only($data, [
+            'title',
+            'slug',
+            'description',
+            'event_at',
+            'location',
+            'quota',
+            'price',
+            'status',
+            'category_id',
+        ]);
+
+        $event->update($allowed);
 
         return $event->fresh();
     }
@@ -26,13 +55,18 @@ class EventService
         return $event->delete();
     }
 
-    public function listEvent(): LengthAwarePaginator
+    public function listEvents(int $perPage = 10): LengthAwarePaginator
     {
         return Event::query()
             ->with(['category', 'organizer', 'images'])
             ->published()
             ->upcoming()
             ->orderBy('event_at')
-            ->paginate(10);
+            ->paginate($perPage);
+    }
+
+    public function findEventOrFail(int $id): Event
+    {
+        return Event::findOrFail($id);
     }
 }
