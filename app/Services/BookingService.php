@@ -3,26 +3,39 @@
 namespace App\Services;
 
 use App\Models\Booking;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class BookingService
 {
-    public function createBooking(array $data): Booking
+    public function createBooking(array $data, ?int $userId): Booking
     {
-        return Booking::create($data)
+        if (!$userId) {
+            throw new \RuntimeException('Authenticated user is required to create booking.');
+        }
+
+        $allowed = Arr::only($data, [
+            'event_id',
+            'booking_date',
+            'status',
+        ]);
+
+        $allowed['user_id'] = $userId;
+
+        return Booking::create($allowed)
             ->load(['user', 'event']);
     }
 
     public function updateBooking(Booking $booking, array $data): Booking
     {
-        $allowed = collect($data)->only([
+        $allowed = Arr::only($data, [
             'booking_date',
             'status',
-        ])->toArray();
+        ]);
 
         $booking->update($allowed);
 
-        return $booking->load(['user', 'event']);
+        return $booking->fresh()->load(['user', 'event']);
     }
 
     public function deleteBooking(Booking $booking): bool
@@ -30,10 +43,16 @@ class BookingService
         return $booking->delete();
     }
 
-    public function listBookings(): LengthAwarePaginator
+    public function listBookings(int $perPage = 10): LengthAwarePaginator
     {
-        return Booking::with(['user', 'event'])
+        return Booking::query()
+            ->with(['user', 'event'])
             ->latest()
-            ->paginate(10);
+            ->paginate($perPage);
+    }
+
+    public function findBookingOrFail(int $id): Booking
+    {
+        return Booking::findOrFail($id);
     }
 }

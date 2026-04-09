@@ -7,9 +7,8 @@ use App\Http\Requests\Booking\StoreBookingRequest;
 use App\Http\Requests\Booking\UpdateBookingRequest;
 use App\Models\Booking;
 use App\Services\BookingService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Nette\Utils\Json;
+use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class BookingController extends Controller
 {
@@ -25,9 +24,12 @@ class BookingController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json(
-            $this->bookingService->listBookings()
-        );
+        $bookings = $this->bookingService->listBookings();
+
+        return response()->json([
+            'message' => 'Bookings retrieved successfully',
+            'data' => $bookings
+        ]);
     }
 
     /**
@@ -35,10 +37,13 @@ class BookingController extends Controller
      */
     public function store(StoreBookingRequest $request): JsonResponse
     {
-        $booking = $this->bookingService->createBooking($request->validated());
+        $booking = $this->bookingService->createBooking(
+            $request->validated(),
+            Auth::id()
+        );
 
         return response()->json([
-            'message' => 'Booking berhasil dibuat',
+            'message' => 'Booking created successfully',
             'data' => $booking
         ], 201);
     }
@@ -51,7 +56,7 @@ class BookingController extends Controller
         $booking->load(['user', 'event']);
 
         return response()->json([
-            'message' => 'Booking ditemukan',
+            'message' => 'Booking retrieved successfully',
             'data' => $booking
         ]);
     }
@@ -61,12 +66,15 @@ class BookingController extends Controller
      */
     public function update(UpdateBookingRequest $request, Booking $booking): JsonResponse
     {
-        $booking = $this->bookingService->updateBooking($booking, $request->validated());
+        $booking = $this->bookingService->updateBooking(
+            $booking,
+            $request->validated()
+        );
 
         return response()->json([
-            'message' => 'Booking berhasil diperbarui',
+            'message' => 'Booking updated successfully',
             'data' => $booking
-        ], 200);
+        ]);
     }
 
     /**
