@@ -9,11 +9,12 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
         'name',
@@ -62,10 +63,10 @@ class User extends Authenticatable
         return $this->hasManyThrough(
             Ticket::class,
             Booking::class,
-            'user_id',    
-            'booking_id', 
-            'id',         
-            'id'          
+            'user_id',
+            'booking_id',
+            'id',
+            'id'
         );
     }
 
@@ -74,8 +75,8 @@ class User extends Authenticatable
         return $this->hasManyThrough(
             Payment::class,
             Booking::class,
-            'user_id',    
-            'booking_id', 
+            'user_id',
+            'booking_id',
             'id',
             'id'
         );
