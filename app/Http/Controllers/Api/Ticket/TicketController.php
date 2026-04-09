@@ -7,8 +7,7 @@ use App\Http\Requests\Ticket\StoreTicketRequest;
 use App\Http\Requests\Ticket\UpdateTicketRequest;
 use App\Models\Ticket;
 use App\Services\TicketService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class TicketController extends Controller
 {
@@ -18,14 +17,18 @@ class TicketController extends Controller
     {
         $this->ticketService = $ticketService;
     }
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        return response()->json(
-            $this->ticketService->listTickets()
-        );
+        $tickets = $this->ticketService->listTickets();
+
+        return response()->json([
+            'message' => 'Tickets retrieved successfully',
+            'data' => $tickets
+        ]);
     }
 
     /**
@@ -33,10 +36,12 @@ class TicketController extends Controller
      */
     public function store(StoreTicketRequest $request): JsonResponse
     {
-        $ticket = $this->ticketService->createTicket($request->validated());
+        $ticket = $this->ticketService->createTicket(
+            $request->validated()
+        );
 
         return response()->json([
-            'message' => 'Tiket berhasil dibuat',
+            'message' => 'Ticket created successfully',
             'data' => $ticket
         ], 201);
     }
@@ -46,10 +51,10 @@ class TicketController extends Controller
      */
     public function show(Ticket $ticket): JsonResponse
     {
-        $ticket->load(['booking', 'booking.user', 'booking.event']);
+        $ticket->load(['booking.user', 'booking.event']);
 
         return response()->json([
-            'message' => 'Tiket ditemukan',
+            'message' => 'Ticket retrieved successfully',
             'data' => $ticket
         ]);
     }
@@ -59,10 +64,13 @@ class TicketController extends Controller
      */
     public function update(UpdateTicketRequest $request, Ticket $ticket): JsonResponse
     {
-        $ticket = $this->ticketService->updateTicket($ticket, $request->validated());
+        $ticket = $this->ticketService->updateTicket(
+            $ticket,
+            $request->validated()
+        );
 
         return response()->json([
-            'message' => 'Tiket berhasil diperbarui',
+            'message' => 'Ticket updated successfully',
             'data' => $ticket
         ]);
     }

@@ -11,7 +11,7 @@ use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\Image\ImageController;
 use App\Http\Controllers\Api\Review\ReviewController;
 use App\Http\Controllers\Api\Notification\NotificationController;
-
+use App\Http\Controllers\Api\Ticket\TicketController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -29,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('events', EventController::class)->except(['index', 'show']);
 
     Route::apiResource('bookings', BookingController::class);
+    Route::apiResource('tickets', TicketController::class);
     Route::apiResource('payments', PaymentController::class);
     Route::apiResource('images', ImageController::class);
     Route::apiResource('reviews', ReviewController::class);
