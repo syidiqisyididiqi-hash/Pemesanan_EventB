@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Api\Image;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Image\StoreImageRequest;
+use App\Http\Requests\Image\UpdateImageRequest;
+use App\Models\Event;
 use App\Models\Image;
 use App\Services\ImageService;
 use Illuminate\Http\JsonResponse;
-use App\Http\Requests\Image\StoreImageRequest;
-use App\Http\Requests\Image\UpdateImageRequest;
 
 class ImageController extends Controller
 {
@@ -23,9 +24,11 @@ class ImageController extends Controller
      */
     public function index(): JsonResponse
     {
+        $images = $this->imageService->listImages();
+
         return response()->json([
-            'message' => 'Daftar gambar',
-            'data' => $this->imageService->listImages()
+            'message' => 'Images retrieved successfully',
+            'data' => $images
         ]);
     }
 
@@ -34,10 +37,14 @@ class ImageController extends Controller
      */
     public function store(StoreImageRequest $request): JsonResponse
     {
-        $image = $this->imageService->createImage($request->validated());
+        $data = $request->validated();
+        $event = Event::findOrFail($data['event_id']);
+        $path = $request->file('image')->store('images', 'public');
+
+        $image = $this->imageService->createImage($event, $path);
 
         return response()->json([
-            'message' => 'Gambar berhasil ditambahkan',
+            'message' => 'Image created successfully',
             'data' => $image
         ], 201);
     }
@@ -47,10 +54,10 @@ class ImageController extends Controller
      */
     public function show(Image $image): JsonResponse
     {
-        $image->load('imageable');
+        $image = $this->imageService->findImageOrFail($image->id);
 
         return response()->json([
-            'message' => 'Gambar ditemukan',
+            'message' => 'Image retrieved successfully',
             'data' => $image
         ]);
     }
@@ -60,10 +67,17 @@ class ImageController extends Controller
      */
     public function update(UpdateImageRequest $request, Image $image): JsonResponse
     {
-        $image = $this->imageService->updateImage($image, $request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('images', 'public');
+            $image = $this->imageService->updateImage($image, $path);
+        } elseif (isset($data['image_path'])) {
+            $image = $this->imageService->updateImage($image, $data['image_path']);
+        }
 
         return response()->json([
-            'message' => 'Gambar berhasil diperbarui',
+            'message' => 'Image updated successfully',
             'data' => $image
         ]);
     }

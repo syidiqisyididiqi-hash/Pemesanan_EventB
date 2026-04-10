@@ -23,9 +23,8 @@ class StoreImageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image_path' => ['required', 'string'],
-            'imageable_id' => ['required', 'integer'],
-            'imageable_type' => ['required', 'string'],
+            'event_id' => ['required', 'exists:events,id'],
+            'image' => ['required', 'image', 'max:2048'],
         ];
     }
 }

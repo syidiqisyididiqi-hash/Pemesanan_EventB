@@ -23,7 +23,8 @@ class UpdateImageRequest extends FormRequest
     public function rules(): array
     {
         return [
-             'image_path' => ['required', 'string'],
+            'image' => ['sometimes', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'image_path' => ['sometimes', 'string'],
         ];
     }
 }

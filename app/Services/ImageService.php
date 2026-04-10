@@ -3,35 +3,45 @@
 namespace App\Services;
 
 use App\Models\Image;
-use Illuminate\Support\Arr;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class ImageService
 {
-    public function createImage(array $data): Image
+    public function createImage(Model $imageable, string $path): Image
     {
-        $allowed = Arr::only($data, [
-            'image_path',
-            'imageable_id',
-            'imageable_type',
-        ]);
-
-        return Image::create($allowed)
-            ->load('imageable');
+        return $imageable->images()->create([
+            'image_path' => $path,
+        ])->load('imageable');
     }
 
-    public function updateImage(Image $image, array $data): Image
+    public function updateImage(Image $image, string $path): Image
     {
-        $allowed = Arr::only($data, [
-            'image_path',
-        ]);
+        if ($image->image_path) {
+            if (Storage::disk('public')->exists($image->image_path)) {
+                Storage::disk('public')->delete($image->image_path);
+            } elseif (Storage::exists($image->image_path)) {
+                Storage::delete($image->image_path);
+            }
+        }
 
-        $image->update($allowed);
+        $image->update([
+            'image_path' => $path,
+        ]);
 
         return $image->load('imageable');
     }
 
     public function deleteImage(Image $image): bool
     {
+        if ($image->image_path) {
+            if (Storage::disk('public')->exists($image->image_path)) {
+                Storage::disk('public')->delete($image->image_path);
+            } elseif (Storage::exists($image->image_path)) {
+                Storage::delete($image->image_path);
+            }
+        }
+
         return $image->delete();
     }
 
