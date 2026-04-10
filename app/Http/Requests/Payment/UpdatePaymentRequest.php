@@ -24,21 +24,10 @@ class UpdatePaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'payment_method' => [
-                'sometimes',
-                'in:credit_card,debit_card,e_wallet,bank_transfer',
-            ],
-
-            'status' => [
-                'sometimes',
-                'in:unpaid,paid,failed',
-            ],
-
-            'payment_date' => [
-                'nullable',
-                'date',
-                Rule::requiredIf(fn() => $this->status === 'paid'),
-            ],
+            'booking_id' => ['sometimes', 'exists:bookings,id'],
+            'amount' => ['sometimes', 'numeric', 'min:0'],
+            'payment_method' => ['sometimes', 'in:credit_card,debit_card,e_wallet,bank_transfer'],
+            'status' => ['sometimes', 'in:unpaid,paid,failed'],
         ];
     }
 }

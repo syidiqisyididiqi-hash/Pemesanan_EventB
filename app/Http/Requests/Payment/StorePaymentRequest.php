@@ -23,9 +23,8 @@ class StorePaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'payment_code' => ['required', 'string', 'unique:payments,payment_code'],
             'booking_id' => ['required', 'exists:bookings,id'],
-            'amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'amount' => ['required', 'numeric', 'min:0'],
             'payment_method' => ['required', 'in:credit_card,debit_card,e_wallet,bank_transfer'],
         ];
     }

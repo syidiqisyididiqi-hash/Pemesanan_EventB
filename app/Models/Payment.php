@@ -6,6 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $booking_id
+ * @property float $amount
+ * @property string $payment_method
+ * @property \Illuminate\Support\Carbon|null $payment_date
+ * @property string $status
+ */
 class Payment extends Model
 {
     use HasFactory;

@@ -5,40 +5,52 @@ namespace App\Services;
 use App\Models\Payment;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class PaymentService
 {
     public function createPayment(array $data): Payment
     {
         $allowed = Arr::only($data, [
-            'payment_code',
             'booking_id',
             'amount',
             'payment_method',
         ]);
 
+        $allowed['payment_code'] = $this->generatePaymentCode();
+        $allowed['status'] = 'unpaid';
+        $allowed['payment_date'] = null;
+
         return Payment::create($allowed)
-            ->load(['booking', 'booking.user', 'booking.event']);
+            ->load(['booking.user', 'booking.event']);
     }
 
     public function updatePayment(Payment $payment, array $data): Payment
     {
         $allowed = Arr::only($data, [
+            'booking_id',
+            'amount',
             'payment_method',
             'status',
         ]);
 
-        if (array_key_exists('status', $allowed)) {
+        if ($payment->status === 'paid' && isset($allowed['status']) && $allowed['status'] !== 'paid') {
+            abort(400, 'Paid payment cannot be modified.');
+        }
+
+        $payment->fill($allowed);
+
+        if (isset($allowed['status'])) {
             if ($allowed['status'] === 'paid') {
-                $allowed['payment_date'] = Carbon::now();
+                $payment->payment_date = Carbon::now();
             } else {
-                $allowed['payment_date'] = null;
+                $payment->payment_date = null;
             }
         }
 
-        $payment->update($allowed);
+        $payment->save();
 
-        return $payment->load(['booking', 'booking.user', 'booking.event']);
+        return $payment->load(['booking.user', 'booking.event']);
     }
 
     public function deletePayment(Payment $payment): bool
@@ -48,13 +60,23 @@ class PaymentService
 
     public function listPayments(int $perPage = 10)
     {
-        return Payment::with(['booking', 'booking.user', 'booking.event'])
+        return Payment::with(['booking.user', 'booking.event'])
             ->latest()
             ->paginate($perPage);
     }
 
     public function findPaymentOrFail(int $id): Payment
     {
-        return Payment::with(['booking', 'booking.user', 'booking.event'])->findOrFail($id);
+        return Payment::with(['booking.user', 'booking.event'])
+            ->findOrFail($id);
+    }
+
+    private function generatePaymentCode(): string
+    {
+        do {
+            $code = 'PAY-' . strtoupper(Str::random(8));
+        } while (Payment::where('payment_code', $code)->exists());
+
+        return $code;
     }
 }

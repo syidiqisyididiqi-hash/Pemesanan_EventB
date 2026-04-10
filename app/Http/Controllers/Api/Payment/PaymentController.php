@@ -23,9 +23,11 @@ class PaymentController extends Controller
      */
     public function index(): JsonResponse
     {
+        $payments = $this->paymentService->listPayments();
+
         return response()->json([
-            'message' => 'Daftar pembayaran',
-            'data' => $this->paymentService->listPayments()
+            'message' => 'Payments retrieved successfully',
+            'data' => $payments
         ]);
     }
 
@@ -34,10 +36,12 @@ class PaymentController extends Controller
      */
     public function store(StorePaymentRequest $request)
     {
-        $payment = $this->paymentService->createPayment($request->validated());
+        $payment = $this->paymentService->createPayment(
+            $request->validated()
+        );
 
         return response()->json([
-            'message' => 'Pembayaran berhasil dibuat',
+            'message' => 'Payment created successfully',
             'data' => $payment
         ], 201);
     }
@@ -47,10 +51,10 @@ class PaymentController extends Controller
      */
     public function show(Payment $payment): JsonResponse
     {
-        $payment->load(['booking', 'booking.user', 'booking.event']);
+        $payment->load(['booking.user', 'booking.event']);
 
         return response()->json([
-            'message' => 'Pembayaran ditemukan',
+            'message' => 'Payment retrieved successfully',
             'data' => $payment
         ]);
     }
@@ -60,10 +64,13 @@ class PaymentController extends Controller
      */
     public function update(UpdatePaymentRequest $request, Payment $payment): JsonResponse
     {
-        $payment = $this->paymentService->updatePayment($payment, $request->validated());
+        $payment = $this->paymentService->updatePayment(
+            $payment,
+            $request->validated()
+        );
 
         return response()->json([
-            'message' => 'Pembayaran berhasil diperbarui',
+            'message' => 'Payment updated successfully',
             'data' => $payment
         ]);
     }
