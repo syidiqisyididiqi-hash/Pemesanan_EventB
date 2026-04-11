@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Api\Notification;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Notification\StoreNotificationRequest;
+use App\Http\Requests\Notification\UpdateNotificationRequest;
+use App\Models\Notification;
 use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
-use App\Http\Requests\Notification\StoreNotificationRequest;
-use App\Models\Notification;
-use App\Http\Requests\Notification\UpdateNotificationRequest;
 
 class NotificationController extends Controller
 {
@@ -22,13 +21,14 @@ class NotificationController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request): JsonResponse
+    public function index(): JsonResponse
     {
-        $perPage = $request->input('per_page', 10);
+        $notifications = $this->notificationService->listNotifications();
 
-        $notifications = $this->notificationService->listNotifications($perPage);
-
-        return response()->json($notifications);
+        return response()->json([
+            'message' => 'Notifications retrieved successfully',
+            'data' => $notifications
+        ]);
     }
 
     /**
@@ -36,7 +36,9 @@ class NotificationController extends Controller
      */
     public function store(StoreNotificationRequest $request): JsonResponse
     {
-        $notification = $this->notificationService->createNotification($request->validated());
+        $notification = $this->notificationService->createNotification(
+            $request->validated()
+        );
 
         return response()->json([
             'message' => 'Notification created successfully',
@@ -49,7 +51,12 @@ class NotificationController extends Controller
      */
     public function show(Notification $notification): JsonResponse
     {
-        return response()->json($notification);
+        $notification->load('user');
+
+        return response()->json([
+            'message' => 'Notification retrieved successfully',
+            'data' => $notification
+        ]);
     }
 
     /**
@@ -59,12 +66,14 @@ class NotificationController extends Controller
         UpdateNotificationRequest $request,
         Notification $notification
     ): JsonResponse {
-        $updated = $this->notificationService
-            ->updateNotification($notification, $request->validated());
+        $notification = $this->notificationService->updateNotification(
+            $notification,
+            $request->validated()
+        );
 
         return response()->json([
             'message' => 'Notification updated successfully',
-            'data' => $updated
+            'data' => $notification
         ]);
     }
 
@@ -75,19 +84,20 @@ class NotificationController extends Controller
     {
         $this->notificationService->deleteNotification($notification);
 
-        return response()->json([
-            'message' => 'Notification deleted successfully'
-        ]);
+        return response()->json(null, 204);
     }
 
+    /**
+     * Mark notification as read.
+     */
     public function markAsRead(Notification $notification): JsonResponse
     {
-        $updated = $this->notificationService
+        $notification = $this->notificationService
             ->markNotificationAsRead($notification);
 
         return response()->json([
             'message' => 'Notification marked as read',
-            'data' => $updated
+            'data' => $notification
         ]);
     }
 }

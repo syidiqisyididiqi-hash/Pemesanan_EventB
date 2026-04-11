@@ -3,19 +3,14 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
-use Illuminate\Auth\AuthenticationException;
 
 class Authenticate extends Middleware
 {
     /**
-     * Paksa API selalu mengembalikan JSON 401.
+     * Untuk API, jangan pernah redirect ke halaman login web.
      */
-    protected function unauthenticated($request, array $guards)
+    protected function redirectTo($request)
     {
-        throw new AuthenticationException(
-            'Unauthenticated.',
-            $guards,
-            null
-        );
+        return null;
     }
 }

@@ -13,8 +13,9 @@ class NotificationService
             'user_id',
             'title',
             'message',
-            'is_read',
         ]);
+
+        $allowed['is_read'] = $data['is_read'] ?? false;
 
         return Notification::create($allowed)
             ->load('user');
@@ -28,7 +29,8 @@ class NotificationService
             'is_read',
         ]);
 
-        $notification->update($allowed);
+        $notification->fill($allowed);
+        $notification->save();
 
         return $notification->load('user');
     }
@@ -61,8 +63,13 @@ class NotificationService
 
     public function markNotificationAsRead(Notification $notification): Notification
     {
-        $notification->update(['is_read' => true]);
+        if ($notification->is_read) {
+            return $notification->load('user');
+        }
 
-        return $notification;
+        $notification->is_read = true;
+        $notification->save();
+
+        return $notification->load('user');
     }
 }
