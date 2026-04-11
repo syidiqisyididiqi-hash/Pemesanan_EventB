@@ -7,7 +7,6 @@ use App\Http\Requests\Event\StoreEventRequest;
 use App\Http\Requests\Event\UpdateEventRequest;
 use App\Models\Event;
 use App\Services\EventService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -19,6 +18,7 @@ class EventController extends Controller
     {
         $this->eventService = $eventService;
     }
+
     /**
      * Display a listing of the resource.
      */
