@@ -24,7 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::apiResource('roles', RoleController::class);
-    Route::apiResource('users', UserController::class)->except(['store']);
+    Route::apiResource('users', UserController::class);
     Route::apiResource('categories', CategoryController::class)->except(['index', 'show']);
     Route::apiResource('events', EventController::class)->except(['index', 'show']);
     Route::apiResource('bookings', BookingController::class);

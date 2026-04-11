@@ -7,14 +7,15 @@ use Illuminate\Support\Arr;
 
 class ReviewService
 {
-    public function createReview(array $data): Review
+    public function createReview(array $data, int $userId): Review
     {
         $allowed = Arr::only($data, [
             'event_id',
-            'user_id',
             'rating',
             'comment',
         ]);
+
+        $allowed['user_id'] = $userId;
 
         return Review::create($allowed)
             ->load(['user', 'event']);
