@@ -11,9 +11,6 @@ use Illuminate\Validation\Rules\Password;
 
 class StoreUserRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
@@ -23,38 +20,44 @@ class StoreUserRequest extends FormRequest
     {
         throw new HttpResponseException(response()->json([
             'message' => 'Validation failed',
-            'errors' => $validator->errors(),
+            'errors'  => $validator->errors(),
         ], 422));
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:100',
+            'name' => ['required','string','max:100'],
+
             'email' => [
                 'required',
                 'email',
                 'max:150',
                 'lowercase',
-                Rule::unique('users', 'email'),
+                Rule::unique('users','email'),
             ],
+
             'password' => [
                 'required',
                 Password::min(8)->letters()->numbers(),
             ],
-            'role_id' => ['nullable', 'exists:roles,id'],
+
+            'role_id' => ['required','exists:roles,id'],
+
             'phone' => [
                 'nullable',
                 'string',
                 'max:20',
-                Rule::unique('users', 'phone'),
+                Rule::unique('users','phone'),
             ],
-            'avatar' => ['nullable', 'string', 'max:255'],
+
+            // ⬇️ TERIMA FILE, BUKAN STRING
+            'avatar' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048',
+            ],
         ];
     }
 }

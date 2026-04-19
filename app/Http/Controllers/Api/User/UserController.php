@@ -8,6 +8,7 @@ use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -35,7 +36,14 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request): JsonResponse
     {
-        $user = $this->userService->createUser($request->validated());
+        $data = $request->validated();
+
+        // ubah file jadi path string
+        if ($request->hasFile('avatar')) {
+            $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        $user = $this->userService->createUser($data);
 
         return response()->json([
             'message' => 'User created successfully',
@@ -61,7 +69,19 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user): JsonResponse
     {
-        $updated = $this->userService->updateUser($user, $request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('avatar')) {
+            // hapus avatar lama jika ada
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $data['avatar'] = $path;
+        }
+
+        $updated = $this->userService->updateUser($user, $data);
 
         return response()->json([
             'message' => 'User updated successfully',

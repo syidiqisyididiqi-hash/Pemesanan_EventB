@@ -47,7 +47,13 @@ class UpdateUserRequest extends FormRequest
                 'max:20',
                 Rule::unique('users', 'phone')->ignore($userId),
             ],
-            'avatar' => ['sometimes', 'string', 'max:255'],
+            'avatar' => [
+                'sometimes',
+                'file',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048'
+            ],
         ];
     }
 }
